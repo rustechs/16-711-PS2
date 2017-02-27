@@ -1,0 +1,20 @@
+MuJoCo Pro Trial license activation key, number 63445, type 6.
+
+Issued to Alexander Volkov <alexandv@andrew.cmu.edu>.
+
+Expires March 11, 2017.
+
+This file activates MuJoCo Pro on a single computer with id:
+LINUX_0M0WD10JCLDMJPBPT0_NR0X04D31BX1HW228
+
+Do not modify this file. Its entire content, including the
+plain text section, is used by the activation manager.
+
+518174c6efbd915834961e69648ae95814213cf2ccf413d278deba15bbf65676
+68525b958c101768750677e41e716969904e75db1d2dbc03cdf86931dec704b7
+b81e02e9bcddb4d7c41a5f4f0f95592dd74e80d3806bd186a7dcbce775b18dd1
+b232fdbe3e096698c0e925881c8f5442032579b5c5ab2e8e57393ad53aca1aff
+929e3164762bea3cb5fe2de038d00958b0b55f2cba62e0c79d53fc2fba540b6f
+91f86f6682d1a43b2cd0ee317226889475f1aa8cb0b862e60a6b1ed3bb9d04ee
+725331af43c2b454032bbe111f9f0ee43fe2e4548075ad843d9c4502602295ac
+3012cab64bfac16b771001ca66d1a3a061572c46eead331dc955253be1b2b06c
