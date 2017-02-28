@@ -13,7 +13,7 @@ clc; clear; close all
 % Define symbolic parameters
 syms Mc Mp Ip l t KE PE g real
 % Define symbolic time-dependent state variables
-syms x(t) xDot(t) theta(t) thetaDot(t) f(t) tau(t) q(t) qDot(t) L(x,xDot,q,qDot,t)
+syms x(t) xDot(t) theta(t) thetaDot(t) f(t) tau(t) q(t) qDot(t) L(x,xDot,theta,thetaDot,t)
 
 tau = [f 0];
 
@@ -31,7 +31,7 @@ PE = Mp*g*l*cos(theta)/2;
 L = KE-PE;
 
 % Create symbolic equation of motion
-dLdqDot = gradient(L(t),qDot);
+dLdqDot = gradient(L(x,xDot,theta,thetaDot,t),qDot);
 dLdq = gradient(L,q);
 
 % Equate generalized torques (RHS) with LHS terms

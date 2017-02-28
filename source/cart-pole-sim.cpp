@@ -22,7 +22,6 @@ void keyboard(GLFWwindow* window, int key, int scancode, int act, int mods);
 void mouse_button(GLFWwindow* window, int button, int act, int mods);
 void mouse_move(GLFWwindow* window, double xpos, double ypos);
 void scroll(GLFWwindow* window, double xoffset, double yoffset);
-void drop(GLFWwindow* window, int count, const char** paths);
 
 // Simulate + Render
 void makeoptionstring(const char* name, char key, char* buf);
@@ -42,7 +41,6 @@ bool showoption = false;
 bool showinfo = true;
 bool showfullscreen = false;
 bool slowmotion = false;
-bool showdepth = false;
 int showhelp = 1;                   // 0: none; 1: brief; 2: full
 
 // abstract visualization
@@ -56,8 +54,6 @@ char status[1000] = "";
 int refreshrate;
 const int fontscale = mjFONTSCALE_150;
 mjrContext con;
-float depth_buffer[5120*2880];        // big enough for 5K screen
-unsigned char depth_rgb[1280*720*3];  // 1/4th of screen
 
 // selection and perturbation
 bool button_left = false;
@@ -73,7 +69,6 @@ const char help_title[] =
 "Help\n"
 "Option\n"
 "Info\n"
-"Depth\n"
 "Full screen\n"
 "Stereo\n"
 "Slow motion\n"
@@ -104,7 +99,6 @@ const char help_content[] =
 "F1\n"
 "F2\n"
 "F3\n"
-"F4\n"
 "F5\n"
 "F6\n"
 "Enter\n"
@@ -581,17 +575,6 @@ void render(GLFWwindow* window) {
     mjrRect rect = {0, 0, 0, 0};
     glfwGetFramebufferSize(window, &rect.width, &rect.height);
 
-    // no model: empty screen
-    if( !m )
-    {
-        mjr_rectangle(rect, 0.2f, 0.3f, 0.4f, 1);
-        mjr_overlay(mjFONT_NORMAL, mjGRID_TOPLEFT, rect, "Drag-and-drop model file here", 0, &con);
-
-        // swap buffers
-        glfwSwapBuffers(window); 
-        return;
-    }
-
     // advance simulation
     simulation();
 
@@ -683,29 +666,6 @@ void render(GLFWwindow* window) {
 
     // render
     mjr_render(rect, &scn, &con);
-
-    // show depth map
-    if( showdepth )
-    {
-        // get the depth buffer
-        mjr_readPixels(NULL, depth_buffer, rect, &con);
-
-        // convert to RGB, subsample by 4
-        for( int r=0; r<rect.height; r+=4 )
-            for( int c=0; c<rect.width; c+=4 )
-            {
-                // get subsampled address
-                int adr = (r/4)*(rect.width/4) + c/4;
-
-                // assign rgb
-                depth_rgb[3*adr] = depth_rgb[3*adr+1] = depth_rgb[3*adr+2] = 
-                    (unsigned char)((1.0f-depth_buffer[r*rect.width+c])*255.0f);
-            }
-
-        // show in bottom-right corner
-        mjrRect bottomright = {(3*rect.width)/4, 0,  rect.width/4, rect.height/4};
-        mjr_drawPixels(depth_rgb, NULL, bottomright, &con);
-    }
 
     // show overlays
     if( showhelp==1 )
