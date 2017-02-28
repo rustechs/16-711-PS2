@@ -13,26 +13,35 @@ clc; clear; close all
 % Define symbolic parameters
 syms Mc Mp Ip l t KE PE g real
 % Define symbolic time-dependent state variables
-syms x(t) xDot(t) theta(t) thetaDot(t) f(t) tau(t) q(t) qDot(t) L(x,xDot,theta,thetaDot,t)
+syms x xDot xDDot theta thetaDot thetaDDot f tau q qDot L real
 
+% Generalized forces
 tau = [f 0];
 
 % Generalized coord's
-xDot = diff(x(t),t);
-thetaDot = diff(theta(t),t);
-q = [x theta]';
-qDot = [xDot thetaDot]';
+q = [x theta];
+qDot = [xDot thetaDot];
+qDDot = [xDDot thetaDDot];
 
 % System Energies
-KE = 0.5*(Mc + Mp)*xDot^2 + 0.5*(Ip + Mp*(l/2)^2)*thetaDot^2;
+i = [1 0];
+j = [0 1];
+vp = (xDot - l/2*cos(theta)*thetaDot)*i + (-l/2*sin(theta)*thetaDot)*j;
+
+KEc = 0.5*(Mc)*xDot^2;
+KEp = 0.5*(Mp)*(vp*vp') + 0.5*Ip*thetaDot^2;
+KE = KEc + KEp;
 PE = Mp*g*l*cos(theta)/2;
 
 % Compute lagrangian
 L = KE-PE;
 
 % Create symbolic equation of motion
-dLdqDot = gradient(L(x,xDot,theta,thetaDot,t),qDot);
+dLdqDot = gradient(L,qDot);
 dLdq = gradient(L,q);
 
 % Equate generalized torques (RHS) with LHS terms
-tau = diff(dLdqDot,t) - dLdq;
+LHS = jacobian(dLdqDot,[q qDot])*[qDot qDDot]';
+
+% simplify!
+LHS = simplify(LHS);
