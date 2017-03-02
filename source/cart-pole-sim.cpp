@@ -51,9 +51,10 @@ mjvPerturb pert;
 char status[1000] = "";
 
 // OpenGL rendering
-int refreshrate;
+int refreshRate;
 const int fontscale = mjFONTSCALE_150;
 mjrContext con;
+
 
 // selection and perturbation
 bool button_left = false;
@@ -63,6 +64,9 @@ double lastx = 0;
 double lasty = 0;
 int needselect = 0;                 // 0: none, 1: select, 2: center, 3: center and track 
 double window2buffer = 1;           // framebuffersize / windowsize (for scaled video modes)
+
+// Select controller
+mjfGeneric mjcb_control = ctrlManual;
 
 // help strings
 const char help_title[] = 
@@ -150,10 +154,7 @@ int main(int argc, const char** argv) {
 	glfwWindowHint(GLFW_SAMPLES,4);
 
 	// Set up mono visualization
-	if( !window ) {
-        glfwWindowHint(GLFW_STEREO, 0);
-        window = glfwCreateWindow(1200, 900, "Cart-Pole Simulation", NULL, NULL);
-    }
+    GLFWwindow* window = glfwCreateWindow(1200, 900, "Cart-Pole Simulation", NULL, NULL);
     
     // Die if something fucked up with creating a window
     if( !window ) {
@@ -301,10 +302,6 @@ void keyboard(GLFWwindow* window, int key, int scancode, int act, int mods){
         showinfo = !showinfo;
         break;
 
-    case GLFW_KEY_F4:                   // depth
-        showdepth = !showdepth;
-        break;
-
     case GLFW_KEY_F5:                   // toggle full screen
         showfullscreen = !showfullscreen;
         if( showfullscreen )
@@ -410,7 +407,7 @@ void keyboard(GLFWwindow* window, int key, int scancode, int act, int mods){
             if( key==GLFW_KEY_A )
                 autoscale(window);
             else if( key==GLFW_KEY_L && lastfile[0] )
-                loadmodel(window, lastfile, 0);
+                loadmodel(window, lastfile);
 
             break;
         }
@@ -749,9 +746,9 @@ void simulation(void) {
         // slow motion factor: 10x
         mjtNum factor = (slowmotion ? 10 : 1);
 
-        // advance effective simulation time by 1/refreshrate
+        // advance effective simulation time by 1/refreshRate
         mjtNum startsimtm = d->time;
-        while( (d->time-startsimtm)*factor < 1.0/refreshrate )
+        while( (d->time-startsimtm)*factor < 1.0/refreshRate )
         {
             // clear old perturbations, apply new
             mju_zero(d->xfrc_applied, 6*m->nbody);
@@ -765,4 +762,17 @@ void simulation(void) {
             mj_step(m, d);
         }
     }
+}
+
+/**************************** CONTROLLERS ****************************/
+void ctrlManual(const mJModel* m, mjData* d) {
+
+}
+
+void ctrlLQR(const mJModel* m, mjData* d) {
+
+}
+
+void ctrlNonlinear(const mJModel* m, mjData* d) {
+
 }
