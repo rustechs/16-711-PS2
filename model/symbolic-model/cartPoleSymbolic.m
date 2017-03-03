@@ -41,7 +41,7 @@ dLdqDot = gradient(L,qDot);
 dLdq = gradient(L,q);
 
 % Equate generalized torques (RHS) with LHS terms
-LHS = jacobian(dLdqDot,[q qDot])*[qDot qDDot]';
+LHS = jacobian(dLdqDot,[q qDot])*[qDot qDDot]'-dLdq;
 
 % simplify!
 LHS = simplify(LHS);
@@ -53,3 +53,33 @@ LHS = LHS - tau;
 
 z = [x theta xDot thetaDot];
 zDot = [xDot thetaDot xDDot thetaDDot];
+u = f;
+
+% Plug in system parameters
+Mc = 1000;
+Mp = 100;
+Ip = 0;
+g = 9.81;
+l = 1;
+
+% Use feedback linearization to stabilize system anywhere
+zDot = simplify(subs(zDot));
+
+% Linearize system about z = 0, u = 0;
+x = 0;
+xDot = 0;
+theta = 0;
+thetaDot = 0;
+A = subs(jacobian(zDot,z));
+B = subs(jacobian(zDot,u));
+
+A = double(subs(simplify(A)));
+B = double(subs(simplify(B)));
+
+% Generate LQR controller
+Q = diag([1 4 0.1 0.1]);
+R = 0.00001;
+[K,~,lambda] = lqr(A,B,Q,R,zeros(4,1));
+
+
+

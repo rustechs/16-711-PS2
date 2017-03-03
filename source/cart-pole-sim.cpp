@@ -73,11 +73,13 @@ double window2buffer = 1;           // framebuffersize / windowsize (for scaled 
 
 // Select controller
 mjfGeneric mjcb_control = ctrlManual;
+
 // Select initial conditions
-mjtNum ICpos[2] = {0,mjPI/32};
+mjtNum ICpos[2] = {0,mjPI/5};
 mjtNum ICvel[2] = {0,0};
 // K linear gain vector corresponding to [x theta xDot thetaDot]
-mjtNum K[4] = {5000,100000,100,100};
+mjtNum K[4] = {-300,30000,-600,1000};
+mjtNum Klqr[4] = {-316,25452,-977,5519};
 
 // Control output
 mjtNum u;
@@ -799,7 +801,12 @@ void ctrlManual(const mjModel* m, mjData* d) {
 }
 
 void ctrlLQR(const mjModel* m, mjData* d) {
+    u = -(Klqr[0]*d->qpos[0] + Klqr[1]*d->qpos[1] + Klqr[2]*d->qvel[0] + Klqr[3]*d->qvel[1]);
+    
+    printf("Control Output: %f\n",u);
+    printf("State: [%f,%f,%f,%f]\n\n",d->qpos[0],d->qpos[1],d->qvel[0],d->qvel[1]);
 
+    mju_copy(d->ctrl,&u,1);
 }
 
 void ctrlNonlinear(const mjModel* m, mjData* d) {
