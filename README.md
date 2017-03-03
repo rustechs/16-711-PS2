@@ -4,8 +4,10 @@ Dynamics simulation and closed-loop control of a cart-pole system.
 Authors: Thu Nguyen & Alexander Volkov
 
 ## Files
-- **foo.cpp**
-- **bar.h**
+- **source/cart-pole-sim.cpp**
+- **source/makefile**
+- **model/cart-pole.xml** - The cart-pole MuJoCo model definition
+- **include/*** - Header files required by MuJoCo simulator
 
 ## Media
 
