@@ -28,6 +28,12 @@ void makeoptionstring(const char* name, char key, char* buf);
 void render(GLFWwindow* window);
 void simulation(void);
 
+// Controls
+void ctrlManual(const mjModel* m, mjData* d);
+void ctrlLQR(const mjModel* m, mjData* d);
+void ctrlNonlinear(const mjModel* m, mjData* d);
+void setInitialConditions(mjData* d,mjtNum *ICpos, mjtNum *ICvel);
+
 /**************************** GLOBAL VARS ****************************/
 
 // model
@@ -67,6 +73,14 @@ double window2buffer = 1;           // framebuffersize / windowsize (for scaled 
 
 // Select controller
 mjfGeneric mjcb_control = ctrlManual;
+// Select initial conditions
+mjtNum ICpos[2] = {0,mjPI/32};
+mjtNum ICvel[2] = {0,0};
+// K linear gain vector corresponding to [x theta xDot thetaDot]
+mjtNum K[4] = {5000,100000,100,100};
+
+// Control output
+mjtNum u;
 
 // help strings
 const char help_title[] = 
@@ -190,6 +204,9 @@ int main(int argc, const char** argv) {
 
     // Load the cart-pole model description
     loadmodel(window,"../model/cart-pole.xml");
+
+    // Set initial conditions
+    setInitialConditions(d,ICpos,ICvel);
 
     // Main loop
     while( !glfwWindowShouldClose(window) )
@@ -324,6 +341,7 @@ void keyboard(GLFWwindow* window, int key, int scancode, int act, int mods){
 
     case GLFW_KEY_BACKSPACE:            // reset
         mj_resetData(m, d);
+        setInitialConditions(d,ICpos,ICvel);
         mj_forward(m, d);
         break;
 
@@ -765,14 +783,25 @@ void simulation(void) {
 }
 
 /**************************** CONTROLLERS ****************************/
-void ctrlManual(const mJModel* m, mjData* d) {
+void setInitialConditions(mjData *d,mjtNum *ICpos,mjtNum *ICvel) {
+    mju_copy(d->qpos,ICpos,2);
+    mju_copy(d->qvel,ICvel,2);
+}
+
+void ctrlManual(const mjModel* m, mjData* d) {
+    
+    u = -(K[0]*d->qpos[0] + K[1]*d->qpos[1] + K[2]*d->qvel[0] + K[3]*d->qvel[1]);
+    
+    printf("Control Output: %f\n",u);
+    printf("State: [%f,%f,%f,%f]\n\n",d->qpos[0],d->qpos[1],d->qvel[0],d->qvel[1]);
+
+    mju_copy(d->ctrl,&u,1);
+}
+
+void ctrlLQR(const mjModel* m, mjData* d) {
 
 }
 
-void ctrlLQR(const mJModel* m, mjData* d) {
-
-}
-
-void ctrlNonlinear(const mJModel* m, mjData* d) {
+void ctrlNonlinear(const mjModel* m, mjData* d) {
 
 }

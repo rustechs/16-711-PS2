@@ -16,7 +16,7 @@ syms Mc Mp Ip l t KE PE g real
 syms x xDot xDDot theta thetaDot thetaDDot f tau q qDot L real
 
 % Generalized forces
-tau = [f 0];
+tau = [f 0]';
 
 % Generalized coord's
 q = [x theta];
@@ -45,3 +45,11 @@ LHS = jacobian(dLdqDot,[q qDot])*[qDot qDDot]';
 
 % simplify!
 LHS = simplify(LHS);
+
+% Convert to state space
+LHS = LHS - tau;
+
+[xDDot,thetaDDot] = solve(LHS(1),LHS(2),xDDot,thetaDDot);
+
+z = [x theta xDot thetaDot];
+zDot = [xDot thetaDot xDDot thetaDDot];
