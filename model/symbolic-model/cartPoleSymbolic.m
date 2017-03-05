@@ -40,14 +40,14 @@ L = KE-PE;
 dLdqDot = gradient(L,qDot);
 dLdq = gradient(L,q);
 
-% Equate generalized torques (RHS) with LHS terms
+% Compute Lagrange Equations
 LHS = jacobian(dLdqDot,[q qDot])*[qDot qDDot]'-dLdq;
 
 % simplify!
-LHS = simplify(LHS);
+LHSstd = simplify(LHS);
 
 % Convert to state space
-LHS = LHS - tau;
+LHS = LHSstd - tau;
 
 [xDDot,thetaDDot] = solve(LHS(1),LHS(2),xDDot,thetaDDot);
 
@@ -55,26 +55,15 @@ z = [x theta xDot thetaDot];
 zDot = [xDot thetaDot xDDot thetaDDot];
 u = f;
 
-% Plug in system parameters
-Mc = 1000;
-Mp = 100;
-Ip = 0;
-g = 9.81;
-l = 1;
-
 % Use feedback linearization to stabilize system anywhere
-zDot = simplify(subs(zDot));
+zDot = simplify(zDot);
 
 % Linearize system about z = 0, u = 0;
-x = 0;
-xDot = 0;
-theta = 0;
-thetaDot = 0;
-A = subs(jacobian(zDot,z));
-B = subs(jacobian(zDot,u));
+A = subs(jacobian(zDot,z),{Mc,Mp,Ip,g,l,x,xDot,theta,thetaDot},[1000,100,0,9.81,1,0,0,0,0]);
+B = subs(jacobian(zDot,u),{Mc,Mp,Ip,g,l,x,xDot,theta,thetaDot},[1000,100,0,9.81,1,0,0,0,0]);
 
-A = double(subs(simplify(A)));
-B = double(subs(simplify(B)));
+A = double(subs(simplify(A),{Mc,Mp,Ip,g,l,x,xDot,theta,thetaDot},[1000,100,0,9.81,1,0,0,0,0]));
+B = double(subs(simplify(B),{Mc,Mp,Ip,g,l,x,xDot,theta,thetaDot},[1000,100,0,9.81,1,0,0,0,0]));
 
 % Generate LQR controller
 Q = diag([1 4 0.1 0.1]);

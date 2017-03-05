@@ -72,14 +72,16 @@ int needselect = 0;                 // 0: none, 1: select, 2: center, 3: center 
 double window2buffer = 1;           // framebuffersize / windowsize (for scaled video modes)
 
 // Select controller
-mjfGeneric mjcb_control = ctrlManual;
+mjfGeneric mjcb_control = ctrlNonlinear;
 
 // Select initial conditions
-mjtNum ICpos[2] = {0,mjPI/5};
+mjtNum ICpos[2] = {10,-mjPI};
 mjtNum ICvel[2] = {0,0};
 // K linear gain vector corresponding to [x theta xDot thetaDot]
 mjtNum K[4] = {-300,30000,-600,1000};
 mjtNum Klqr[4] = {-316,25452,-977,5519};
+mjtNum kNL[3] = {0.5,10,10};
+mjtNum nlOutputClamp = 1000;
 
 // Control output
 mjtNum u;
@@ -90,7 +92,6 @@ const char help_title[] =
 "Option\n"
 "Info\n"
 "Full screen\n"
-"Stereo\n"
 "Slow motion\n"
 "Pause\n"
 "Reset\n"
@@ -120,7 +121,6 @@ const char help_content[] =
 "F2\n"
 "F3\n"
 "F5\n"
-"F6\n"
 "Enter\n"
 "Space\n"
 "BackSpace\n"
@@ -271,7 +271,6 @@ void loadmodel(GLFWwindow* window, const char* filename){
     d = mj_makeData(m);
     mj_forward(m, d);
 
-    // TODO: Might want to get rid of lastfile if not needed?
     strcpy(lastfile, filename);
 
     // re-create custom context
@@ -327,10 +326,6 @@ void keyboard(GLFWwindow* window, int key, int scancode, int act, int mods){
             glfwMaximizeWindow(window);
         else
             glfwRestoreWindow(window);
-        break;
-
-    case GLFW_KEY_F6:                   // stereo
-        scn.stereo = (scn.stereo==mjSTEREO_NONE ? mjSTEREO_QUADBUFFERED : mjSTEREO_NONE);
         break;
 
     case GLFW_KEY_ENTER:                // slow motion
@@ -810,5 +805,48 @@ void ctrlLQR(const mjModel* m, mjData* d) {
 }
 
 void ctrlNonlinear(const mjModel* m, mjData* d) {
+    
+    mjtNum theta = 0;
 
+    if (d->qpos[1] > 0) {
+        theta = fmod(d->qpos[1]+mjPI,2*mjPI) - mjPI;
+    } else {
+        theta = fmod(d->qpos[1]-mjPI,2*mjPI) + mjPI;
+    }
+
+    mjtNum p = 0;
+    mjtNum Eerr = 0;
+
+    // mjtNum absErr = mju_sqrt(mju_pow(theta,2)+mju_pow(d->qvel[1],2));
+
+    // printf("Absolute Error: %f\n",absErr);
+
+    // LQR once near state-space origin
+    if (mju_abs(theta) < mjPI/4 && (mju_abs(d->qvel[1]) < mjPI && theta*(d->qvel[1]) >= 0 || mju_abs(d->qvel[1]) < mjPI && theta*(d->qvel[1]) < 0)) {
+        printf("Switched to LQR!\n");
+
+        u = -(K[0]*d->qpos[0] + K[1]*theta + K[2]*d->qvel[0] + K[3]*d->qvel[1]);
+    // Start with energy shaping controller
+    } else {
+
+        printf("Switched to Energy Shaping Control!\n");
+
+        Eerr = 12.5*mju_pow(d->qvel[1],2) + 490.5*mju_cos(theta) - 490.5;
+
+        p = -mju_tan(theta)*4.905 - kNL[0]*d->qvel[1]*mju_cos(theta)*Eerr - kNL[1]*(d->qpos[0]) - kNL[2]*(d->qvel[0]);
+
+        if (p < -nlOutputClamp) {
+            p = -nlOutputClamp;
+        } else if (p > nlOutputClamp) {
+            p = nlOutputClamp;
+        }   
+
+        u = (1100 - 100*mju_pow(mju_cos(theta),2))*p-981*mju_sin(theta)*mju_cos(theta) + 50*mju_pow(d->qvel[1],2)*mju_sin(theta);
+
+    }
+
+    printf("Control Output: %f\n",u);
+    printf("State: [%f,%f,%f,%f]\n\n",d->qpos[0],theta,d->qvel[0],d->qvel[1]);
+
+    mju_copy(d->ctrl,&u,1);    
 }

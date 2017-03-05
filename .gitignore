@@ -49,3 +49,7 @@ octave-workspace
 
 # Simulink autosave extension
 .autosave
+
+# builds
+bin/cart-pole
+bin/*.TXT
