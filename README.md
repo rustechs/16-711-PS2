@@ -248,4 +248,4 @@ printf("State: [%f,%f,%f,%f]\n\n",d->qpos[0],theta,d->qvel[0],d->qvel[1]);
 
 mju_copy(d->ctrl,&u,1);    
 ```
-[https://www.youtube.com/watch?v=YL3aPpFbIhg](Cart-Pole Swing-up using Energy Shaping Controller) 
+(https://www.youtube.com/watch?v=YL3aPpFbIhg)[Cart-Pole Swing-up using Energy Shaping Controller]
