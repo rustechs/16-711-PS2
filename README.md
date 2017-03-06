@@ -140,7 +140,7 @@ This matches the expected result for this ubiquitously studied system, readily a
 
 The cart-pole dynamics were simulated and visualized using MuJoCo, a general purpose dynamics engine. The simulated passive dynamics (unactuated / uncontrolled) are illustrated in the following video:
 
-[TODO: passive dynamics video]
+[Cart-Pole Passive Dynamics](https://youtu.be/VUy_G41N8dA)
 
 Notably, this model includes only two rigid bodies (cart and pole), and two unconstrained degrees of freedom (one translational of the cart relative to the inertial frame, one rotational of the pole attached to the cart).
 
@@ -152,7 +152,7 @@ A linear controller of the form `u = -Kz` was implemented in order to stabilize 
 
 A video of the system stabilizing using the hand-tuned linear controller is shown below:
 
-[TODO: manual linear gains video]
+[Cart-Pole Linear Controller (Manually Tuned Gains) Stabilization](https://youtu.be/8Z9-TPiBseM)
 
 ### Part 4: LQR Controller
 
@@ -184,7 +184,7 @@ R = 0.00001;
 
 The following video shows the LQR controller in action, stabilizing the cart-pole system about the state-space origin. Note that the initial error in pole angle in the following example is greater than the maximum stabilizable angle by the origin linear controller -- that is, the LQR controller has a larger region of attraction! 
 
-[TODO video]
+[Cart-Pole LQR Stabilization](https://youtu.be/AylGBCjTifg)
 
 ### Parts 5 & 6: Nonlinear Control for Swing Up Maneuver
 
@@ -248,4 +248,4 @@ printf("State: [%f,%f,%f,%f]\n\n",d->qpos[0],theta,d->qvel[0],d->qvel[1]);
 
 mju_copy(d->ctrl,&u,1);    
 ```
-(https://www.youtube.com/watch?v=YL3aPpFbIhg)[Cart-Pole Swing-up using Energy Shaping Controller]
+[Cart-Pole Swing-up using Energy Shaping Controller](https://www.youtube.com/watch?v=YL3aPpFbIhg)
