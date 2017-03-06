@@ -163,3 +163,7 @@ printf("State: [%f,%f,%f,%f]\n\n",d->qpos[0],theta,d->qvel[0],d->qvel[1]);
 mju_copy(d->ctrl,&u,1);    
 ```
 [Cart-Pole Swing-up using Energy Shaping Controller](https://www.youtube.com/watch?v=YL3aPpFbIhg)
+
+In the following video, the system recovers succesfully from large disturbances applied manually to the pole.
+
+[Cart-Pole Disturbance Recovery using Energy Shaping Controller](https://youtu.be/J4fYjw9L5s0)
