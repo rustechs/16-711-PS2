@@ -75,7 +75,7 @@ double window2buffer = 1;           // framebuffersize / windowsize (for scaled 
 mjfGeneric mjcb_control = ctrlNonlinear;
 
 // Select initial conditions
-mjtNum ICpos[2] = {10,-mjPI};
+mjtNum ICpos[2] = {3,mjPI};
 mjtNum ICvel[2] = {0,0};
 // K linear gain vector corresponding to [x theta xDot thetaDot]
 mjtNum K[4] = {-300,30000,-600,1000};
